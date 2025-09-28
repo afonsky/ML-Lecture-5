@@ -23,6 +23,7 @@ hideInToc: true
 <span style="color:gray; font-size: 11px; float: right;">Image credit: Midjourney.<br> Prompt: ‘curse of dimensionality'
 </span>
 </div>
+
 ---
 
 # Dimensionality Reduction
@@ -81,6 +82,21 @@ layout: iframe
 # PCA demo
 url: https://setosa.io/ev/principal-component-analysis/
 ---
+
+---
+layout: iframe
+
+# PCA more demo
+url: https://projector.tensorflow.org/
+---
+
+---
+
+# (If you see this from PDFs)
+
+* PCA demos:
+	* https://setosa.io/ev/principal-component-analysis/
+	* https://projector.tensorflow.org/
 
 ---
 

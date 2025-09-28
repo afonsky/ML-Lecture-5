@@ -736,3 +736,62 @@ $\hat{\beta}_{0:p} = \argmin\limits_{\forall \beta} \{ \mathrm{RSS}_{\beta_0, \b
 * Only 2 predictors are related to the response
 </div>
 </div>
+
+---
+
+# Regularization: Ex. for Classification
+
+<div class="grid grid-cols-[4fr_9fr] gap-2">
+
+<div>
+  <figure>
+  <img src="/iris_setosa.png" style="width: 135px !important;">
+  <img src="/iris_versicolor.png" style="width: 135px !important;">
+  <img src="/iris_virginica.png" style="width: 135px !important;">
+  <figcaption style="color:#b3b3b3ff; font-size: 9px;">Images source:<br>
+    <a href="https://en.wikipedia.org/wiki/Iris_flower_data_set">https://en.wikipedia.org/wiki/Iris_flower_data_set</a>
+  </figcaption>
+</figure>
+</div>
+<div>
+  <figure>
+  <img src="/coefficient_path_plot_original.svg" style="width: 700px !important;">
+  <figcaption style="color:#b3b3b3ff; font-size: 9px;">Image source:
+    <a href="https://scikit-learn.org/stable/auto_examples/linear_model/plot_logistic_path.html">https://scikit-learn.org/stable/auto_examples/linear_model/plot_logistic_path.html</a> (reproduced)
+  </figcaption>
+  </figure>
+</div>
+</div>
+
+---
+
+# Regularization: Ex. for Classification
+
+<div class="grid grid-cols-[3fr_3fr] gap-2">
+
+<div>
+  <figure>
+  <img src="/coefficient_path_plot.svg" style="width: 325px !important;">
+  </figure>
+</div>
+<div>
+  <figure>
+  <img src="/decision_boundary_C_0.0308.svg" style="width: 290px !important;">
+  </figure>
+</div>
+</div>
+<br>
+
+<div class="grid grid-cols-[3fr_3fr] gap-2">
+
+<div>
+  <figure>
+  <img src="/decision_boundary_C_0.0664.svg" style="width: 290px !important;">
+  </figure>
+</div>
+<div>
+  <figure>
+  <img src="/decision_boundary_C_0.1430.svg" style="width: 290px !important;">
+  </figure>
+</div>
+</div>

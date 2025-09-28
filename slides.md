@@ -19,7 +19,7 @@ lineNumbers: false
 css: unocss
 title: Machine Learning
 subtitle: Model Selection & Regularization
-date: 30/09/2024
+date: 29/09/2025
 venue: HSE
 author: Alexey Boldyrev
 ---
@@ -58,10 +58,6 @@ author: Alexey Boldyrev
 NB: This demo uses a custom syntax (using preparser extensions), with all the @@@@.
 -->
 
-
----
-src: ./slides/0_attendance.md
----
 
 ---
 src: ./slides/0_outline.md
