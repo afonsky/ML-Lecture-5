@@ -105,7 +105,7 @@ hideInToc: true
 	3. Return the **train-best** of $\mathcal{M}_0, ... \mathcal{M}_p$
 </div>
 
-* We fit $1 + \frac{p(p+1)}{2}$ models. $60$ features $\Rightarrow 466$ models
+* We fit $1 + \frac{p(p+1)}{2}$ models. $60$ features $\Rightarrow 1831$ models
 	*  In step 2, we could also use some quick-estimate of test error
 
 ---
