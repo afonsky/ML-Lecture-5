@@ -19,7 +19,7 @@ lineNumbers: false
 css: unocss
 title: Machine Learning
 subtitle: Model Selection & Regularization
-date: 29/09/2025
+date: 10/02/2026
 venue: HSE
 author: Alexey Boldyrev
 ---

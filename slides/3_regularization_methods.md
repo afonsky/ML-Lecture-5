@@ -172,6 +172,13 @@ margin: {l: 40, r:20, b:70, t:20, pad: 2}
 	* $\beta_i$ gradually approach and then **snap to zero** with larger $\lambda$
 </v-clicks>
 
+<!--
+Josh Starmer's intuition: Ridge is like putting all features on a diet (they all get smaller).
+Lasso is like eliminating features from the team entirely (some get exactly zero).
+The "snap to zero" behavior of Lasso is what makes it useful for automatic feature selection.
+Andrew Ng calls this "sparsity" — having many zero coefficients.
+-->
+
 ---
 
 # Regularization Methods
@@ -648,27 +655,56 @@ margin: {l: 50, r:20, b:70, t:20, pad: 2}
 
 ---
 
-# Regularization Methods: Bayesian Formulation
+# Regularization: Bayesian Intuition
+
 <v-clicks depth="2">
 
-* Recall that a $\mathrm{RSS}$ loss in Ordinary Least Squares may be written as: <br>
-$\mathcal{L}(\hat{Y}, Y) = (Y - \hat{Y})^T (Y - \hat{Y}) = - \mathrm{ln~p}_{\mathcal{N}} (Y | \hat{Y}, \hat{\sigma}^2 I) + \mathrm{Const.}$
-* Which allows us to re-write the solution of $\mathrm{OLS}$ as **Maximum Likelihood Estimation** (MLE) problem: <br>
-$W_{\mathrm{OLS}} = \argmax\limits_W \{\mathrm{ln~p}_{\mathcal{N}} (Y | X, W)\}$
-* Let's use a Bayes theorem instead!
-	* If we assume some initial distribution on weights $p(W)$, we can update it in the following way: $\mathrm{p}(W | X, Y) \propto \mathrm{p} (Y | X, W) \mathrm{p}(W)$
-* This converts MLE problem into **Maximum a Posteriori** (MAP) estimation problem: <br>
-$W_{\mathrm{MAP}} = \argmax\limits_W \{\mathrm{ln~p}_{\mathcal{N}} (Y | X, W) + \mathrm{ln~p}(W) \}$
+* **Key idea**: Regularization = having a **prior belief** about the weights
+	* Before seeing data, we *believe* weights should be small (close to zero)
+	* This belief **constrains** the model, preventing overfitting
+
+* Formally: OLS minimizes RSS, which is equivalent to **Maximum Likelihood Estimation** (MLE)
+	* MLE: *"Find weights that best explain the data"*
+
+* Adding a prior on weights gives us **Maximum a Posteriori** (MAP) estimation:
+	* MAP: *"Find weights that best explain the data AND are consistent with our beliefs"*
+	* $\underbrace{\mathrm{p}(W | \mathrm{data})}_{\text{posterior}} \propto \underbrace{\mathrm{p}(\mathrm{data} | W)}_{\text{likelihood}} \cdot \underbrace{\mathrm{p}(W)}_{\text{prior belief}}$
+
 </v-clicks>
+
+<!--
+Yaser Abu-Mostafa: "Regularization is the price we pay for simplicity."
+The Bayesian view makes regularization feel natural — we're just encoding our preference for simpler models.
+This connects to Occam's Razor: prefer the simplest explanation consistent with the data.
+-->
 
 ---
 
-# Regularization Methods: Bayesian Formulation
+# Regularization: Bayesian Intuition
 
-* $W_{\mathrm{MAP}} = \argmax\limits_W \{\mathrm{ln~p}_{\mathcal{N}} (Y | X, W) + \mathrm{ln~p}(W) \}$
-	* If $\mathrm{p}(W)$ is a standard Normal distribution, we get **Ridge regression**
-	* If $\mathrm{p}(W)$ is a standard Laplace distribution, we get **Lasso regression**
-	* If we generalize this idea from using a single weight estimate to a distribution of weights and use standard Normal prior $\mathrm{p}(W)$, we get **Gaussian Process**
+* **The choice of prior determines the type of regularization:**
+
+| Prior on weights $\mathrm{p}(W)$ | Shape | Regularization | Effect |
+|:---:|:---:|:---:|:---:|
+| Normal (Gaussian) | Bell curve | **Ridge** ($L_2$) | Shrinks all $\beta$ toward zero |
+| Laplace (Double-exponential) | Peaked at zero | **Lasso** ($L_1$) | Some $\beta$ exactly zero |
+
+<v-clicks>
+
+* **Why Lasso produces exact zeros**: The Laplace prior has a *sharp peak* at zero
+	* This encourages the optimizer to snap coefficients to exactly zero
+	* The Normal prior has a *smooth peak* — coefficients get small but never reach zero
+
+* In summary: **Regularization = Occam's Razor** (prefer simpler explanations)
+	* > *"Everything should be made as simple as possible, but not simpler"*<br> — Albert Einstein ([from here](https://en.wikiquote.org/wiki/Albert_Einstein))
+
+</v-clicks>
+
+<!--
+This Bayesian interpretation is beautiful because it unifies different regularization methods under one framework.
+Yann LeCun often discusses how priors/constraints shape learning.
+For advanced students: if we don't just take the MAP estimate but integrate over the full posterior, we get Bayesian regression / Gaussian Processes.
+-->
 
 ---
 
@@ -699,9 +735,14 @@ $\hat{\beta}_{0:p} = \argmin\limits_{\forall \beta} \{ \mathrm{RSS}_{\beta_0, \b
 </figure>
 </div>
 
-<!-- #### The constraint region increases with $\lambda$
-<Arrow x1="550" y1="125" x2="553" y2="260" />
-<Arrow x1="550" y1="125" x2="815" y2="263" /> -->
+<!--
+This is the most important geometric intuition!
+The diamond shape (L1) has corners on the axes → the elliptical contours of RSS are more likely
+to touch the constraint region at a corner where one coefficient is exactly zero.
+The circle shape (L2) has no corners → contours touch at non-zero values.
+Yaser Abu-Mostafa uses this exact diagram to explain why Lasso gives sparse solutions.
+Andrew Ng: "This geometric view is the best way to understand why L1 gives sparsity."
+-->
 
 ---
 
@@ -736,6 +777,166 @@ $\hat{\beta}_{0:p} = \argmin\limits_{\forall \beta} \{ \mathrm{RSS}_{\beta_0, \b
 * Only 2 predictors are related to the response
 </div>
 </div>
+
+<!--
+Key insight (Josh Starmer / StatQuest): When most predictors matter, Ridge performs better.
+When only a few predictors matter, Lasso wins because it zeroes out the irrelevant ones.
+In real life, we usually don't know which case we're in — so try both (or use ElasticNet).
+-->
+
+---
+
+# ElasticNet: Best of Both Worlds
+
+* Combines Ridge ($L_2$) and Lasso ($L_1$) penalties:
+
+$$\mathrm{RSS}_{\mathrm{ElasticNet}} = \sum(y_i - \hat{y}_i)^2 + \lambda \Big[ \alpha \cdot \lVert\beta\rVert_1 + (1-\alpha) \cdot \lVert\beta\rVert_2^2 \Big]$$
+
+<v-clicks depth="2">
+
+* Mixing parameter $\alpha \in [0, 1]$ controls the blend:
+	* $\alpha = 1$: pure Lasso &nbsp;&nbsp;|&nbsp;&nbsp;  $\alpha = 0$: pure Ridge
+
+* **When to use ElasticNet?**
+	* Correlated predictors (groups of related features)
+		* Lasso may **arbitrarily** pick one from a group; ElasticNet keeps the group
+	* When you're unsure whether Ridge or Lasso is better — **safe default**
+	* Often the go-to regularization in practice
+
+* scikit-learn: ``ElasticNet(alpha=1.0, l1_ratio=0.5)``
+	* ``l1_ratio`` = $\alpha$ (mixing parameter)
+
+</v-clicks>
+
+<!--
+Yoshua Bengio: "In practice, ElasticNet often outperforms both Ridge and Lasso."
+Mention Zou & Hastie (2005) who introduced ElasticNet specifically to handle correlated features.
+-->
+
+---
+zoom: 0.9
+---
+
+# Feature Scaling: Critical for Regularization!
+
+* **Problem**: Regularization penalizes large coefficients
+	* But coefficient size depends on the **scale** of the feature!
+	* Feature in meters vs. kilometers $\to$ different coefficient $\beta$, same prediction
+
+
+* **Solution**: Always **standardize** features before regularization
+$$\tilde{X}_j = \frac{X_j - \bar{X}_j}{s_j}$$
+
+<div class="grid grid-cols-[8fr_4fr] gap-10">
+<div>
+<v-click at="1">
+
+* Why? After standardization, a unit change in any feature means the same thing
+	* The penalty treats all coefficients **fairly**
+	* The intercept $\beta_0$ is **NOT** regularized<br> (it's just $\bar{Y}$ after centering)
+</v-click>
+<v-click at="2">
+
+* **Practical tip** (from Sebastian Raschka):
+  * Use ``Pipeline`` to avoid data leakage
+</v-click>
+</div>
+<div>
+<br>
+<br>
+<v-click at="2">
+
+```python
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import Ridge
+
+pipe = Pipeline([
+    ('scaler', StandardScaler()),
+    ('model', Ridge(alpha=1.0))
+])
+pipe.fit(X_train, y_train)
+```
+</v-click>
+</div>
+</div>
+
+<!--
+Andrew Ng emphasizes this in every regularization lecture.
+Without scaling, a small-range feature (0–1) gets almost no penalty while a large-range feature (0–10000) gets heavily penalized. This makes regularization unfair.
+Always use Pipeline to prevent fitting the scaler on test data.
+-->
+
+---
+zoom: 0.9
+---
+
+# Choosing $\lambda$: Cross-Validation
+
+* $\lambda$ is a **hyperparameter** — we choose it, not learn it from data
+
+<v-clicks depth="2">
+
+* Standard approach: **k-fold Cross-Validation**
+	1. Define a grid of $\lambda$ values, e.g. $\lambda \in \{10^{-4}, 10^{-3}, ..., 10^{2}, 10^{3}\}$
+	2. For each $\lambda$, compute average validation error across $k$ folds
+	3. Pick the $\lambda$ with lowest CV error (**min rule**)
+
+* **One Standard Error rule** (Hastie & Tibshirani):
+	* Pick the simplest model (largest $\lambda$) whose CV error is within 1 SE of the minimum
+	* Leads to more regularized, **simpler** models
+
+* scikit-learn makes this easy:
+	* ``RidgeCV``, ``LassoCV``, ``ElasticNetCV`` — efficient built-in CV
+	* ``LassoCV`` uses coordinate descent along the **regularization path**
+		* Much faster than fitting independent models for each $\lambda$
+
+</v-clicks>
+
+<!--
+Mention that scikit-learn's CV estimators use efficient algorithms.
+LassoCV uses warm starts along the regularization path (LARS algorithm).
+Andrew Ng: always use validation/CV for hyperparameter tuning, never test set.
+-->
+
+---
+zoom: 0.9
+---
+
+# Regularization: Practical Tips
+
+> *"Start simple, add complexity only as needed"*<br>— Andrew Ng
+
+<v-clicks>
+
+1. **Always scale** your features before applying regularization
+2. **Start with Ridge** as a baseline (it's numerically stable and rarely hurts)
+3. **Use Lasso** if you need automatic feature selection
+4. **Use ElasticNet** as a safe default when unsure
+5. **Cross-validate** to select $\lambda$ (and $\alpha$ for ElasticNet)
+6. **Never** use training error to select hyperparameters
+
+</v-clicks>
+
+<v-click>
+<br>
+<div class="bg-orange-100 p-3 rounded">
+
+#### Common Mistakes to Avoid
+* Regularizing the intercept $\beta_0$
+* Forgetting to standardize features
+* Using training metrics to select $\lambda$
+* Applying regularization without understanding bias-variance tradeoff
+
+</div>
+</v-click>
+
+<!--
+Karpathy's recipe for training neural nets (adapted for linear models):
+1. First, verify your model can overfit a small batch (catches bugs).
+2. Then regularize to improve generalization.
+Sebastian Raschka: regularization should be thought of as part of model selection, not model fitting.
+-->
 
 ---
 

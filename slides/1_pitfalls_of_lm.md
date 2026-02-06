@@ -30,6 +30,48 @@ hideInToc: true
 </div>
 
 ---
+
+# The Overfitting Problem
+
+<div class="grid grid-cols-[7fr_5fr] gap-4">
+<div>
+
+* **Key Observation**: More features $\neq$ better predictions
+	* Training error always decreases with more features
+	* But **test error** follows a U-shape!
+
+<v-clicks>
+
+* Why does this happen?
+	* The model **memorizes noise** in the training data
+	* Complex models have too many degrees of freedom
+	* With $p \gg N$, OLS can fit training data **perfectly** — zero error!
+	* But this means the model has *learned noise, not signal*
+
+</v-clicks>
+</div>
+<div>
+<br>
+  <figure>
+    <img src="/ESL_figure_7.1.png" style="width: 300px; position: relative">
+    <figcaption style="color:#b3b3b3ff; font-size: 11px;">Image source:
+      <a href="https://hastie.su.domains/ElemStatLearn/">ESL Fig. 7.1</a>
+    </figcaption>
+  </figure>
+<br>
+
+> *"The most important problem in ML is the problem of overfitting"*<br>— Yaser Abu-Mostafa
+</div>
+</div>
+
+
+<!--
+Mention Andrew Ng's perspective: overfitting is the single most important practical problem.
+Yaser Abu-Mostafa in "Learning from Data" emphasizes that fitting noise is the enemy.
+Ask students: what happens if we have 10 data points and 100 features?
+-->
+
+---
 zoom: 1.2
 ---
 # Pitfalls of Linear Models
@@ -105,3 +147,15 @@ zoom: 1.2
 	* Reduce dimensionality of the data
 		* **Principal Component Regression**, **Partial Least Squares**
 </v-clicks>
+<br>
+<v-click>
+
+> **Important**: Even when $X^TX$ *is* invertible ($d+1 \leq N$), we may still <br> benefit from these methods to **prevent overfitting** and improve predictions!
+
+</v-click>
+
+<!--
+This is a crucial point. The mathematical singularity problem is just one reason.
+The deeper reason is the bias-variance tradeoff: we trade a little bias for a big reduction in variance.
+Andrew Ng: "High bias = underfitting, High variance = overfitting."
+-->

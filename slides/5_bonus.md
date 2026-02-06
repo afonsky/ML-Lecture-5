@@ -4,6 +4,69 @@ layout: center
 # Extra Materials
 
 ---
+
+# Key Takeaways
+
+<v-clicks>
+
+1. **Overfitting** is the central challenge — more features $\neq$ better model
+2. **Subset Selection** reduces features but can be computationally expensive
+	* Forward Stepwise is the practical go-to
+3. **Regularization** shrinks coefficients — the workhorse approach in practice
+	* **Ridge**: shrinks all coefficients, never zeroes out, numerically stable
+	* **Lasso**: automatic feature selection, some $\beta_i$ become exactly zero
+	* **ElasticNet**: combines both, handles correlated features — safe default
+4. **Dimensionality Reduction** (PCA) transforms features into uncorrelated components
+	* PCR = PCA + regression; closely related to Ridge
+5. **Cross-validation** is your best friend for choosing hyperparameters
+6. **Always scale features** before regularization
+
+</v-clicks>
+
+> *"With four parameters I can fit an elephant, <br> and with five I can make him wiggle his trunk."* — John von Neumann
+
+<!--
+This quote beautifully captures the essence of overfitting.
+The whole lecture is about trading a little bias for a lot of variance reduction.
+Emphasize: there's no single "best" method — use CV to decide.
+-->
+
+<!-- ---
+
+# The Regularization Decision Tree
+<br>
+<br>
+
+```mermaid {scale: 0.55}
+flowchart LR
+    A[Start: Linear Model] --> B{Many features?}
+    B -- "No (p < 20)" --> C["Try OLS first"]
+    C --> D{Overfitting?}
+    D -- No --> E["Done! ✓"]
+    D -- Yes --> F{Need feature selection?}
+    B -- "Yes (p ≥ 20)" --> F
+    F -- Yes --> G["Lasso or ElasticNet"]
+    F -- No --> H["Ridge Regression"]
+    F -- "Not sure" --> I["ElasticNet (safe default)"]
+    G --> J["Cross-validate λ and α"]
+    H --> J
+    I --> J
+    J --> K["Evaluate on test set"]
+    K --> E
+
+    A ~~~ B
+
+    style E fill:#90EE90
+    style J fill:#FFE4B5
+``` -->
+
+<!--
+Andrej Karpathy's philosophy: start with the simplest thing that could possibly work.
+Only add complexity when you can demonstrate it helps on validation data.
+This tree is a simplification but captures the practical workflow well.
+-->
+
+---
 zoom: 0.9
 ---
 

@@ -40,6 +40,12 @@ hideInToc: true
 	* $p$ features yield $2^p$ model fits
 		* $2^{60} = 1~152~921~504~606~846~976$ fittings for just $60$ features
 
+<!--
+Josh Starmer (StatQuest): BSS is easy to understand but impractical for real datasets.
+With modern datasets having hundreds or thousands of features, exhaustive search is impossible.
+This motivates greedy approaches like stepwise selection.
+-->
+
 ---
 
 # Best Subset Selection (BSS)
@@ -105,8 +111,15 @@ hideInToc: true
 	3. Return the **train-best** of $\mathcal{M}_0, ... \mathcal{M}_p$
 </div>
 
-* We fit $1 + \frac{p(p+1)}{2}$ models. $60$ features $\Rightarrow 1831$ models
+* We fit $1 + \frac{p(p+1)}{2}$ models. $60$ features $\Rightarrow 466$ models
 	*  In step 2, we could also use some quick-estimate of test error
+
+<!--
+Forward stepwise is essentially a greedy algorithm — similar to greedy algorithms in CS.
+At each step, it makes the locally optimal choice (add the best single feature).
+This doesn't guarantee finding the global best subset, but works surprisingly well in practice.
+Andrew Ng: "In practice, forward selection is almost always good enough."
+-->
 
 ---
 
@@ -140,3 +153,40 @@ hideInToc: true
 		* **Bayesian Information Criterion**, $\mathrm{BIC} := \frac{1}{n\hat{\sigma}^2} (\mathrm{RSS} + (\log n)\hat{\sigma}^2)$
 
 </v-clicks>
+
+<!--
+Cp, AIC, BIC all estimate test MSE without actually splitting data.
+BIC penalizes model complexity more than AIC (log n > 2 for n > 7), so it tends to select simpler models.
+In practice, cross-validation is more reliable but these criteria are useful for quick comparisons.
+-->
+
+---
+
+# Subset Selection: Practical Summary
+
+| Method | Models Fitted | Works for $p > n$? | Global Optimum? |
+|--------|:---:|:---:|:---:|
+| Best Subset | $2^p$ | No | Yes |
+| Forward Stepwise | $1 + \frac{p(p+1)}{2}$ | Yes | No |
+| Backward Stepwise | $1 + \frac{p(p+1)}{2}$ | No | No |
+| Mixed Stepwise | Varies | Yes | No |
+
+<v-clicks>
+
+* **In practice**: Forward Stepwise is most commonly used
+	* Works even when $p > n$ (unlike BSS and Backward)
+	* Reasonably good approximation to BSS
+	* scikit-learn: ``SequentialFeatureSelector``
+
+* **Which test error estimate to use?**
+	* $C_p$, AIC, BIC are fast but make assumptions about the model
+	* **Cross-validation** makes fewer assumptions — preferred when computation allows
+	* **One Standard Error rule** (Hastie & Tibshirani): pick the *simplest* model whose CV error is within 1 SE of the minimum
+
+</v-clicks>
+
+<!--
+Sebastian Raschka recommends cross-validation as the default approach.
+The one-standard-error rule is a practical heuristic that favors parsimony.
+Mention: in sklearn, use SequentialFeatureSelector with direction='forward' or 'backward'.
+-->

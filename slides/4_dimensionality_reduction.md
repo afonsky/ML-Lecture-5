@@ -74,7 +74,13 @@ $Z_1 :=
 </figure>
 <br>
 
-#### Don't forget to standartize variables before PCA!
+#### Don't forget to standardize variables before PCA!
+
+<!--
+Sebastian Raschka: "PCA is sensitive to the scale of features. Always standardize first."
+The principal components are computed from the covariance (or correlation) matrix.
+If one feature has range 0-1000 and another 0-1, the first will dominate the PCs.
+-->
 
 ---
 layout: iframe
@@ -139,3 +145,106 @@ url: https://projector.tensorflow.org/
 	* Regress each remaining variable on $Z_1$ and consider just the residuals, $r_2$
 		* They contain most of the remaining information
 	* Then again, determine the direction of $Z_2$ from regression $r_2 \sim X_1$
+
+<!--
+PLS is supervised unlike PCA. It uses the response to guide the dimensionality reduction.
+In practice, PLS is less commonly used than PCA + regression or Ridge/Lasso.
+But PLS is popular in chemometrics and bioinformatics where p >> n.
+-->
+
+---
+zoom: 0.9
+---
+
+# Dimensionality Reduction: PCR in Practice
+
+* **Principal Component Regression (PCR)** = PCA + OLS on top PCs
+	1. Standardize features
+	2. Compute PCs from $X$ (ignoring $Y$)
+	3. Keep top $M$ PCs that explain most variance
+	4. Fit linear regression: $Y = \theta_0 + \theta_1 Z_1 + ... + \theta_M Z_M + \epsilon$
+
+<div class="grid grid-cols-[4fr_3fr] gap-2">
+<div>
+<v-click at="1">
+
+* **Key insight**: PCR is closely related to Ridge regression
+	* Both shrink less-important directions more than important ones
+	* Ridge shrinks **gradually**; PCR **drops** low-variance components entirely
+</v-click>
+<v-click at="2">
+
+* **Limitation**: PCA doesn't use $Y$<br> — the top PCs may not be the most predictive!
+	* That's why PLS exists
+		* but in practice, Ridge/Lasso are often better
+</v-click>
+</div>
+<div>
+<br>
+<br>
+<v-click at="3">
+
+* scikit-learn:
+```python
+from sklearn.decomposition import PCA
+from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import Pipeline
+
+pcr = Pipeline([('pca', PCA(n_components=5)),
+                ('reg', LinearRegression())])
+```
+</v-click>
+</div>
+</div>
+
+<!--
+Andrew Ng: PCR is a useful technique but Ridge/Lasso are usually preferred in practice.
+The connection between PCR and Ridge is elegant: both shrink along the principal component directions,
+but Ridge does it smoothly while PCR does hard thresholding.
+-->
+
+---
+zoom: 0.9
+---
+
+# Beyond Linear Dimensionality Reduction
+
+#### PCA assumes **linear** relationships between features
+#### For non-linear structure, consider:
+
+<div class="grid grid-cols-[5fr_3fr] gap-2">
+<div>
+<v-clicks depth="3">
+
+* **t-SNE** (t-distributed Stochastic Neighbor Embedding)
+	* Great for **visualization** (2D/3D) of high-dimensional data
+	* Preserves local neighborhood structure
+	* Not suitable for feature extraction in predictive models
+
+* **UMAP** (Uniform Manifold Approximation and Projection)
+	* Faster than t-SNE, preserves more global structure
+	* Increasingly popular for exploratory data analysis
+
+* **Kernel PCA**
+	* Applies PCA in a higher-dimensional space via the kernel trick
+	* Can capture non-linear relationships
+
+</v-clicks>
+</div>
+<div>
+<br>
+<br>
+<br>
+<br>
+<v-click at="11">
+
+> These are **visualization/exploration** tools.<br> For prediction, regularization (Ridge/Lasso/ElasticNet) usually wins!
+</v-click>
+</div>
+</div>
+
+<!--
+Yann LeCun and Yoshua Bengio have emphasized that learning good representations (features)
+is at the heart of modern ML. t-SNE/UMAP are key tools for understanding what your model learns.
+Andrej Karpathy uses t-SNE extensively to visualize embedding spaces in neural networks.
+-->
